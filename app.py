@@ -29,7 +29,7 @@ st.write(data.head())
 ignore_features = ['High', 'Low', 'Open', 'Volume']
 
 if st.button('Setup Model'):
-    st.write('Just a moment....')
+    st.write('Running....')
     # streamlitのグラフを初期化
     plt.clf()
     # モデルのセットアップ
