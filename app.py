@@ -5,16 +5,18 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from pycaret.time_series import *
 
+import datetime
+
 from src.extract_stock_price import extract_stock_price
 from src.transform_stock_price import transform_stock_price
 
 # タイトル
 st.title('S&P500 Stock price predictions')
 
-# S&P500のデータを取得
-ticker = "^GSPC"
-start_date = "2020-01-01"
-end_date = "2024-12-31"
+# 入力するフォームを作成
+ticker = st.text_input('Ticker', '^GSPC')
+start_date = st.date_input('Start', value=datetime.date(2020, 1, 1))
+end_date = st.date_input('End', value=datetime.date.today())
 
 # データを取得
 data = extract_stock_price(ticker, start_date, end_date)
@@ -24,7 +26,7 @@ data = transform_stock_price(data)
 
 # データの確認
 st.write('データの先頭5行を表示')
-st.write(data.head())
+st.dataframe(data.head())
 
 # 予測に使わない特徴量を指定
 ignore_features = ['High', 'Low', 'Open', 'Volume']
