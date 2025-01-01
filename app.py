@@ -1,7 +1,4 @@
 
-# キャッシュをクリア
-st.cache_resource.clear()
-
 import yfinance as yf
 import pandas as pd
 import plotly.express as px
@@ -9,6 +6,9 @@ import plotly.graph_objects as go
 import streamlit as st
 import matplotlib.pyplot as plt
 from pycaret.time_series import *
+
+# キャッシュをクリア
+st.cache_resource.clear()
 
 # タイトル
 st.title('S&P500 Stock price predictions')
