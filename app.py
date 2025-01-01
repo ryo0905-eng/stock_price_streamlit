@@ -10,13 +10,14 @@ import datetime
 from src.extract_stock_price import extract_stock_price
 from src.transform_stock_price import transform_stock_price
 
+
 # タイトル
 st.title('S&P500 Stock price predictions')
 
 # 入力するフォームを作成
-ticker = st.text_input('Ticker', '^GSPC')
-start_date = st.date_input('Start', value=datetime.date(2020, 1, 1))
-end_date = st.date_input('End', value=datetime.date.today())
+ticker = st.sidebar.text_input('Ticker', '^GSPC')
+start_date = st.sidebar.date_input('Start', value=datetime.date(2020, 1, 1))
+end_date = st.sidebar.date_input('End', value=datetime.date.today())
 
 # データを取得
 data = extract_stock_price(ticker, start_date, end_date)
@@ -26,7 +27,7 @@ data = transform_stock_price(data)
 
 # データの確認
 st.write('データの先頭5行を表示')
-st.dataframe(data.head())
+st.dataframe(data)
 
 # 予測に使わない特徴量を指定
 ignore_features = ['High', 'Low', 'Open', 'Volume']
