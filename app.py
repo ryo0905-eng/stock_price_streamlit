@@ -1,5 +1,3 @@
-
-import yfinance as yf
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -7,19 +5,22 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from pycaret.time_series import *
 
+from src.extract_stock_price import extract_stock_price
+from src.transform_stock_price import transform_stock_price
 
 # タイトル
 st.title('S&P500 Stock price predictions')
 
 # S&P500のデータを取得
 ticker = "^GSPC"
-data = yf.download(tickers=ticker, start="2020-01-01", end="2024-12-31", multi_level_index=False)
+start_date = "2020-01-01"
+end_date = "2024-12-31"
 
-# datetime形式に変換
-data.index = pd.to_datetime(data.index)
+# データを取得
+data = extract_stock_price(ticker, start_date, end_date)
 
-# 欠損値は直前の値で補完
-data = data.asfreq('D', method='bfill')
+# データを変換
+data = transform_stock_price(data)
 
 # データの確認
 st.write('データの先頭5行を表示')
