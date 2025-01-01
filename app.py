@@ -7,8 +7,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from pycaret.time_series import *
 
-# キャッシュをクリア
-st.cache_resource.clear()
 
 # タイトル
 st.title('S&P500 Stock price predictions')
@@ -31,6 +29,9 @@ st.write(data.head())
 ignore_features = ['High', 'Low', 'Open', 'Volume']
 
 if st.button('Setup Model'):
+    st.write('Just a moment....')
+    # streamlitのグラフを初期化
+    plt.clf()
     # モデルのセットアップ
     s = setup(data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
 
