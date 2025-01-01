@@ -1,4 +1,7 @@
 
+# キャッシュをクリア
+st.cache_resource.clear()
+
 import yfinance as yf
 import pandas as pd
 import plotly.express as px
@@ -35,8 +38,8 @@ arima = create_model('arima')
 
 # 交差検証結果を表示
 arima_results = pull()
-st.write('交差検証結果')
-st.write(arima_results)
+#st.write('交差検証結果')
+#st.write(arima_results)
 
 # 予測
 pred = predict_model(arima)
