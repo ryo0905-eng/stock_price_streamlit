@@ -30,33 +30,34 @@ st.write(data.head())
 # 予測に使わない特徴量を指定
 ignore_features = ['High', 'Low', 'Open', 'Volume']
 
-# モデルのセットアップ
-s = setup(data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
+if st.button('Setup Model'):
+    # モデルのセットアップ
+    s = setup(data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
 
-#　モデルを作成
-arima = create_model('arima')
+    #　モデルを作成
+    arima = create_model('arima')
 
-# 交差検証結果を表示
-arima_results = pull()
-#st.write('交差検証結果')
-#st.write(arima_results)
+    # 交差検証結果を表示
+    #arima_results = pull()
+    #st.write('交差検証結果')
+    #st.write(arima_results)
 
-# 予測
-pred = predict_model(arima)
+    # 予測
+    pred = predict_model(arima)
 
-# Datetime形式に変換
-pred.index = pred.index.to_timestamp()
-pred.head()
+    # Datetime形式に変換
+    pred.index = pred.index.to_timestamp()
+    pred.head()
 
-# 実際の値をプロット
-fig = px.line(data, x=data.index, y='Close', title='S&P500 Stock price predictions')
+    # 実際の値をプロット
+    fig = px.line(data, x=data.index, y='Close', title='S&P500 Stock price predictions')
 
-# 予測値をプロット
-predicted_trace = go.Scatter(x=pred.index, y=pred['y_pred'], mode='lines', name='Predicted')
-fig.add_trace(predicted_trace)
+    # 予測値をプロット
+    predicted_trace = go.Scatter(x=pred.index, y=pred['y_pred'], mode='lines', name='Predicted')
+    fig.add_trace(predicted_trace)
 
-# 色を変更
-fig.update_traces(line_color='red', selector=dict(name='Predicted'))
+    # 色を変更
+    fig.update_traces(line_color='red', selector=dict(name='Predicted'))
 
-# グラフを表示
-st.plotly_chart(fig)
+    # グラフを表示
+    st.plotly_chart(fig)
