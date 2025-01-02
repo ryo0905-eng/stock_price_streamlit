@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from pycaret.time_series import *
 
 import datetime
+import time
 
 from src.extract_stock_price import extract_stock_price
 from src.transform_stock_price import transform_stock_price
-
 
 # タイトル
 st.title('S&P500 Stock price predictions')
@@ -27,11 +27,11 @@ if 'data' not in st.session_state:
 # ボタンを押してデータを取得
 st.sidebar.write('## 2. Get Data')
 if st.sidebar.button('Get Data'):
-    st.sidebar.write('Running....')
-    st.session_state.data = extract_stock_price(ticker, start_date, end_date)
-    # データを変換
-    st.session_state.data = transform_stock_price(st.session_state.data)
-
+    with st.spinner('Loading data...'):
+        st.session_state.data = extract_stock_price(ticker, start_date, end_date)
+        # データを変換
+        st.session_state.data = transform_stock_price(st.session_state.data)
+        st.sidebar.success('Done!')
 # データを表示
 if st.session_state.data is not None:
     st.dataframe(st.session_state.data)
@@ -39,9 +39,12 @@ if st.session_state.data is not None:
 # 予測
 st.sidebar.write('## 3. Predict')
 if st.sidebar.button('Predict'):
-    st.sidebar.write('Running....')
+    # プログレスバーを表示
+    bar = st.sidebar.progress(30)
+
     # 予測に使わない特徴量を指定
     ignore_features = ['High', 'Low', 'Open', 'Volume']
+
     # モデルのセットアップ
     s = setup(st.session_state.data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
 
@@ -52,13 +55,13 @@ if st.sidebar.button('Predict'):
     #arima_results = pull()
     #st.write('交差検証結果')
     #st.write(arima_results)
-
+    bar.progress(70)
+    
     # 予測
     pred = predict_model(arima)
 
     # Datetime形式に変換
     pred.index = pred.index.to_timestamp()
-    pred.head()
 
     # 実際の値をプロット
     fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price predictions')
@@ -75,6 +78,12 @@ if st.sidebar.button('Predict'):
         xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],
         yaxis_range=[5500, 6400])
 
+    bar.progress(100)
 
     # グラフを表示
     st.plotly_chart(fig)
+
+    # プログレスバーを消去
+    bar.empty()
+
+    
