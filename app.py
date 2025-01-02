@@ -14,30 +14,36 @@ from src.transform_stock_price import transform_stock_price
 # タイトル
 st.title('S&P500 Stock price predictions')
 
-# 入力するフォームを作成
+# 入力フォームを作成
+st.sidebar.write('## 1. Input form')
 ticker = st.sidebar.text_input('Ticker', '^GSPC')
 start_date = st.sidebar.date_input('Start', value=datetime.date(2020, 1, 1))
 end_date = st.sidebar.date_input('End', value=datetime.date.today())
 
-# データを取得
-data = extract_stock_price(ticker, start_date, end_date)
+# session stateを初期化
+if 'data' not in st.session_state:
+    st.session_state.data = None
 
-# データを変換
-data = transform_stock_price(data)
+# ボタンを押してデータを取得
+st.sidebar.write('## 2. Get Data')
+if st.sidebar.button('Get Data'):
+    st.sidebar.write('Running....')
+    st.session_state.data = extract_stock_price(ticker, start_date, end_date)
+    # データを変換
+    st.session_state.data = transform_stock_price(st.session_state.data)
 
-# データの確認
-st.write('データの先頭5行を表示')
-st.dataframe(data)
+# データを表示
+if st.session_state.data is not None:
+    st.dataframe(st.session_state.data)
 
-# 予測に使わない特徴量を指定
-ignore_features = ['High', 'Low', 'Open', 'Volume']
-
-if st.button('Setup Model'):
-    st.write('Running....')
-    # streamlitのグラフを初期化
-    plt.clf()
+# 予測
+st.sidebar.write('## 3. Predict')
+if st.sidebar.button('Predict'):
+    st.sidebar.write('Running....')
+    # 予測に使わない特徴量を指定
+    ignore_features = ['High', 'Low', 'Open', 'Volume']
     # モデルのセットアップ
-    s = setup(data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
+    s = setup(st.session_state.data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
 
     #　モデルを作成
     arima = create_model('arima')
@@ -55,7 +61,7 @@ if st.button('Setup Model'):
     pred.head()
 
     # 実際の値をプロット
-    fig = px.line(data, x=data.index, y='Close', title='S&P500 Stock price predictions')
+    fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price predictions')
 
     # 予測値をプロット
     predicted_trace = go.Scatter(x=pred.index, y=pred['y_pred'], mode='lines', name='Predicted')
@@ -63,6 +69,12 @@ if st.button('Setup Model'):
 
     # 色を変更
     fig.update_traces(line_color='red', selector=dict(name='Predicted'))
+
+    # グラフのズーム位置を指定
+    fig.update_layout(
+        xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],
+        yaxis_range=[5500, 6400])
+
 
     # グラフを表示
     st.plotly_chart(fig)
