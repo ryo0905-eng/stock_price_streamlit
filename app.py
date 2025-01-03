@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+from pycaret.time_series import *
 
 import datetime
 
@@ -17,7 +18,7 @@ st.sidebar.write('## 1. Input form')
 ticker = st.sidebar.text_input('Ticker', '^GSPC')
 start_date = st.sidebar.date_input('Start', value=datetime.date(2020, 1, 1))
 end_date = st.sidebar.date_input('End', value=datetime.date.today())
-model_name = st.sidebar.selectbox('Model', ['ARIMA', 'Auto ARIMA', 'ETS'])
+model_name_list = st.sidebar.multiselect('Model', ['ARIMA', 'Auto ARIMA', 'ETS'])
 
 # session stateを初期化
 if 'data' not in st.session_state:
@@ -40,24 +41,23 @@ st.sidebar.write('## 3. Predict')
 if st.sidebar.button('Predict'):
     # Spinnerを表示
     with st.spinner('Predicting...'):
-        # 結果格納用データフレームを作成
-        df = st.session_state.data.copy()
-
+        # 結果格納用データフレームリストを作成
+        dfs = [st.session_state.data.copy()]
+        # モデルのセットアップ
+        s = setup(st.session_state.data, fh = 30, fold = 1, session_id = 123, target='Actual')
         # 予測
-        pred = predict_stock_price(st.session_state.data, model_name)
-
-        # 予測値をデータフレームに追加
-        df = pd.concat([df, pred], axis=1)
-
+        for model in model_name_list:
+            pred = predict_stock_price(model)
+            dfs.append(pred)
+        # 結果を連結
+        df = pd.concat(dfs, axis=1)
         # グラフをプロット
-        fig = px.line(df, x=df.index, y=['Actual', 'ARIMA'], title='S&P500 Stock price predictions')
-
+        fig = px.line(df, x=df.index, y=['Actual']+model_name_list, title='S&P500 Stock price predictions')
         # グラフのズーム位置を指定
         fig.update_layout(
             xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],
             yaxis_range=[5500, 6400])
-
-        # グラフとデータを表示
+        # グラフを表示
         st.plotly_chart(fig)
         # データを降順で並び替えて表示
         st.dataframe(df.sort_index(ascending=False))
