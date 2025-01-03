@@ -50,11 +50,8 @@ if st.sidebar.button('Predict'):
         # 予測値をデータフレームに追加
         df = pd.concat([df, pred], axis=1)
 
-        # 実際の値をプロット
+        # グラフをプロット
         fig = px.line(df, x=df.index, y=['Actual', 'ARIMA'], title='S&P500 Stock price predictions')
-
-        # 色を変更
-#        fig.update_traces(line_color='red', selector=dict(name='Predicted'))
 
         # グラフのズーム位置を指定
         fig.update_layout(
@@ -63,4 +60,5 @@ if st.sidebar.button('Predict'):
 
         # グラフとデータを表示
         st.plotly_chart(fig)
+        df = df.sort_index(ascending=False)
         st.dataframe(df)
