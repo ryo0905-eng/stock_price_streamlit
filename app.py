@@ -38,49 +38,43 @@ if st.sidebar.button('Get Data'):
 # 予測
 st.sidebar.write('## 3. Predict')
 if st.sidebar.button('Predict'):
-    # プログレスバーを表示
-    bar = st.sidebar.progress(30)
+    # Spinnerを表示
+    with st.spinner('Predicting...'):
+        # 予測に使わない特徴量を指定
+        ignore_features = ['High', 'Low', 'Open', 'Volume']
 
-    # 予測に使わない特徴量を指定
-    ignore_features = ['High', 'Low', 'Open', 'Volume']
+        # モデルのセットアップ
+        s = setup(st.session_state.data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
 
-    # モデルのセットアップ
-    s = setup(st.session_state.data, fh = 30, fold = 5, session_id = 123, target='Close', ignore_features=ignore_features)
+        #　モデルを作成
+        arima = create_model('arima')
 
-    #　モデルを作成
-    arima = create_model('arima')
+        # 交差検証結果を表示
+        #arima_results = pull()
+        #st.write('交差検証結果')
+        #st.write(arima_results)
 
-    # 交差検証結果を表示
-    #arima_results = pull()
-    #st.write('交差検証結果')
-    #st.write(arima_results)
-    bar.progress(70)
-    
-    # 予測
-    pred = predict_model(arima)
+        # 予測
+        pred = predict_model(arima)
 
-    # Datetime形式に変換
-    pred.index = pred.index.to_timestamp()
+        # Datetime形式に変換
+        pred.index = pred.index.to_timestamp()
 
-    # 実際の値をプロット
-    fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price predictions')
+        # 実際の値をプロット
+        fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price predictions')
 
-    # 予測値をプロット
-    predicted_trace = go.Scatter(x=pred.index, y=pred['y_pred'], mode='lines', name='Predicted')
-    fig.add_trace(predicted_trace)
+        # 予測値をプロット
+        predicted_trace = go.Scatter(x=pred.index, y=pred['y_pred'], mode='lines', name='Predicted')
+        fig.add_trace(predicted_trace)
 
-    # 色を変更
-    fig.update_traces(line_color='red', selector=dict(name='Predicted'))
+        # 色を変更
+        fig.update_traces(line_color='red', selector=dict(name='Predicted'))
 
-    # グラフのズーム位置を指定
-    fig.update_layout(
-        xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],
-        yaxis_range=[5500, 6400])
+        # グラフのズーム位置を指定
+        fig.update_layout(
+            xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],
+            yaxis_range=[5500, 6400])
 
-    bar.progress(100)
-
-    # グラフとデータを表示
-    st.plotly_chart(fig)
-    st.dataframe(st.session_state.data)
-    # プログレスバーを消去
-    bar.empty()
+        # グラフとデータを表示
+        st.plotly_chart(fig)
+        st.dataframe(st.session_state.data)
