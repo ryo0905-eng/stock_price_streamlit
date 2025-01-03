@@ -1,6 +1,5 @@
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 from pycaret.time_series import *
 
@@ -58,8 +57,9 @@ if st.sidebar.button('Predict'):
         fig = px.line(df, x=df.index, y=['Actual']+selected_model, title='S&P500 Stock price predictions')
         # グラフのズーム位置を指定
         fig.update_layout(
-            xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],
-            yaxis_range=[5500, 6400])
+            xaxis_range=[df.index.max() - pd.DateOffset(days=90), df.index.max()],
+            yaxis_range=[5500, df.max().max()]
+            )
         # グラフを表示
         st.plotly_chart(fig)
         # データを降順で並び替えて表示
