@@ -31,7 +31,7 @@ if st.sidebar.button('Get Data'):
         # データを変換
         st.session_state.data = transform_stock_price(st.session_state.data)
         # データを表示
-        fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price')
+        fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Actual', title='S&P500 Stock price')
         st.plotly_chart(fig)
         st.dataframe(st.session_state.data)
         st.sidebar.success('Done!')
@@ -41,18 +41,20 @@ st.sidebar.write('## 3. Predict')
 if st.sidebar.button('Predict'):
     # Spinnerを表示
     with st.spinner('Predicting...'):
+        # 結果格納用データフレームを作成
+        df = st.session_state.data.copy()
+
         # 予測
-        pred = predict_stock_price(st.session_state.data, model_name)
+        pred = predict_stock_price(st.session_state.data, model_name).round(0)
+
+        # 予測値をデータフレームに追加
+        df = pd.concat([df, pred], axis=1)
 
         # 実際の値をプロット
-        fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price predictions')
-
-        # 予測値をプロット
-        predicted_trace = go.Scatter(x=pred.index, y=pred['y_pred'], mode='lines', name='Predicted')
-        fig.add_trace(predicted_trace)
+        fig = px.line(df, x=df.index, y=['Actual', 'ARIMA'], title='S&P500 Stock price predictions')
 
         # 色を変更
-        fig.update_traces(line_color='red', selector=dict(name='Predicted'))
+#        fig.update_traces(line_color='red', selector=dict(name='Predicted'))
 
         # グラフのズーム位置を指定
         fig.update_layout(
@@ -61,4 +63,4 @@ if st.sidebar.button('Predict'):
 
         # グラフとデータを表示
         st.plotly_chart(fig)
-        st.dataframe(st.session_state.data)
+        st.dataframe(df)
