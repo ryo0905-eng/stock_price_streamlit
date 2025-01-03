@@ -33,7 +33,6 @@ if st.sidebar.button('Get Data'):
         # データを表示
         fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Actual', title='S&P500 Stock price')
         st.plotly_chart(fig)
-        st.dataframe(st.session_state.data)
         st.sidebar.success('Done!')
 
 # 予測
@@ -60,5 +59,5 @@ if st.sidebar.button('Predict'):
 
         # グラフとデータを表示
         st.plotly_chart(fig)
-        df = df.sort_index(ascending=False)
-        st.dataframe(df)
+        # データを降順で並び替えて表示
+        st.dataframe(df.sort_index(ascending=False))
