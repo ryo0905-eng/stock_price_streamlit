@@ -13,7 +13,7 @@ from src.predict_stock_price import predict_stock_price
 st.title('S&P500 Stock price predictions')
 
 # モデルの辞書を作成
-model_dict = {'ARIMA': 'arima', 'Naive': 'naive', 'ETS': 'ets'}
+model_dict = {'ARIMA': 'arima', 'Naive': 'naive', 'ETS': 'ets', 'Prophet': 'prophet'}
 
 # 入力フォームを作成
 st.sidebar.write('## 1. Input form')
@@ -46,7 +46,7 @@ if st.sidebar.button('Predict'):
         # 結果格納用データフレームリストを作成
         dfs = [st.session_state.data.copy()]
         # モデルのセットアップ
-        s = setup(st.session_state.data, fh = 30, fold = 1, session_id = 123, target='Actual')
+        s = setup(st.session_state.data, fh = 10, fold = 1, session_id = 123, target='Actual')
         # 予測
         for model in selected_model:
             pred = predict_stock_price(model_dict, model)
