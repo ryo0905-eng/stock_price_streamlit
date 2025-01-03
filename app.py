@@ -14,7 +14,7 @@ from src.predict_stock_price import predict_stock_price
 st.title('S&P500 Stock price predictions')
 
 # モデルの辞書を作成
-model_dict = {'ARIMA': 'arima', 'Auto ARIMA': 'auto_arima', 'ETS': 'ets'}
+model_dict = {'ARIMA': 'arima', 'Naive': 'naive', 'ETS': 'ets'}
 
 # 入力フォームを作成
 st.sidebar.write('## 1. Input form')
