@@ -2,11 +2,9 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-import matplotlib.pyplot as plt
 from pycaret.time_series import *
 
 import datetime
-import time
 
 from src.extract_stock_price import extract_stock_price
 from src.transform_stock_price import transform_stock_price
@@ -31,10 +29,11 @@ if st.sidebar.button('Get Data'):
         st.session_state.data = extract_stock_price(ticker, start_date, end_date)
         # データを変換
         st.session_state.data = transform_stock_price(st.session_state.data)
+        # データを表示
+        fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price')
+        st.plotly_chart(fig)
+        st.dataframe(st.session_state.data)
         st.sidebar.success('Done!')
-# データを表示
-if st.session_state.data is not None:
-    st.dataframe(st.session_state.data)
 
 # 予測
 st.sidebar.write('## 3. Predict')
@@ -80,10 +79,8 @@ if st.sidebar.button('Predict'):
 
     bar.progress(100)
 
-    # グラフを表示
+    # グラフとデータを表示
     st.plotly_chart(fig)
-
+    st.dataframe(st.session_state.data)
     # プログレスバーを消去
     bar.empty()
-
-    
