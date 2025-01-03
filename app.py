@@ -2,7 +2,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-from pycaret.time_series import *
 
 import datetime
 
@@ -18,6 +17,7 @@ st.sidebar.write('## 1. Input form')
 ticker = st.sidebar.text_input('Ticker', '^GSPC')
 start_date = st.sidebar.date_input('Start', value=datetime.date(2020, 1, 1))
 end_date = st.sidebar.date_input('End', value=datetime.date.today())
+model_name = st.sidebar.selectbox('Model', ['ARIMA', 'Auto ARIMA', 'ETS'])
 
 # session stateを初期化
 if 'data' not in st.session_state:
@@ -42,7 +42,7 @@ if st.sidebar.button('Predict'):
     # Spinnerを表示
     with st.spinner('Predicting...'):
         # 予測
-        pred = predict_stock_price(st.session_state.data)
+        pred = predict_stock_price(st.session_state.data, model_name)
 
         # 実際の値をプロット
         fig = px.line(st.session_state.data, x=st.session_state.data.index, y='Close', title='S&P500 Stock price predictions')
