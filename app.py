@@ -13,12 +13,15 @@ from src.predict_stock_price import predict_stock_price
 # タイトル
 st.title('S&P500 Stock price predictions')
 
+# モデルの辞書を作成
+model_dict = {'ARIMA': 'arima', 'Auto ARIMA': 'auto_arima', 'ETS': 'ets'}
+
 # 入力フォームを作成
 st.sidebar.write('## 1. Input form')
 ticker = st.sidebar.text_input('Ticker', '^GSPC')
 start_date = st.sidebar.date_input('Start', value=datetime.date(2020, 1, 1))
 end_date = st.sidebar.date_input('End', value=datetime.date.today())
-model_name_list = st.sidebar.multiselect('Model', ['ARIMA', 'Auto ARIMA', 'ETS'])
+selected_model = st.sidebar.multiselect('Model', model_dict.keys(), default=['ETS'])
 
 # session stateを初期化
 if 'data' not in st.session_state:
@@ -46,13 +49,13 @@ if st.sidebar.button('Predict'):
         # モデルのセットアップ
         s = setup(st.session_state.data, fh = 30, fold = 1, session_id = 123, target='Actual')
         # 予測
-        for model in model_name_list:
-            pred = predict_stock_price(model)
+        for model in selected_model:
+            pred = predict_stock_price(model_dict, model)
             dfs.append(pred)
         # 結果を連結
         df = pd.concat(dfs, axis=1)
         # グラフをプロット
-        fig = px.line(df, x=df.index, y=['Actual']+model_name_list, title='S&P500 Stock price predictions')
+        fig = px.line(df, x=df.index, y=['Actual']+selected_model, title='S&P500 Stock price predictions')
         # グラフのズーム位置を指定
         fig.update_layout(
             xaxis_range=[pd.Timestamp.now() - pd.DateOffset(days=90), pd.Timestamp.now()],

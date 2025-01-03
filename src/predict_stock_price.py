@@ -1,9 +1,6 @@
 from pycaret.time_series import *
 
-def predict_stock_price(model_name):
-    # モデルの辞書を作成
-    model_dict = {'ARIMA': 'arima', 'Auto ARIMA': 'auto_arima', 'ETS': 'ets'}
-
+def predict_stock_price(model_dict, model_name):
     #　モデルを作成
     model = create_model(model_dict[model_name])
 
