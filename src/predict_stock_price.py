@@ -25,4 +25,4 @@ def predict_stock_price(df, model_name):
     pred = pred.rename(columns={'y_pred': model_name})
     # Datetime形式に変換
     pred.index = pred.index.to_timestamp()
-    return pred
+    return pred.round(0)

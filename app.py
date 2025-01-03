@@ -45,7 +45,7 @@ if st.sidebar.button('Predict'):
         df = st.session_state.data.copy()
 
         # 予測
-        pred = predict_stock_price(st.session_state.data, model_name).round(0)
+        pred = predict_stock_price(st.session_state.data, model_name)
 
         # 予測値をデータフレームに追加
         df = pd.concat([df, pred], axis=1)
