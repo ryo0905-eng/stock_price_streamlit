@@ -300,7 +300,7 @@ xmltodict==0.14.2
 xxhash==3.5.0
 ydata-profiling==4.12.1
 yellowbrick==1.5
-yfinance==0.2.51
+yfinance==0.2.55
 zict==3.0.0
 zipp==3.21.0
 zope.event==5.0
